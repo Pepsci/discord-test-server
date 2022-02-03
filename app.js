@@ -1,23 +1,43 @@
 require("dotenv").config();
 require("./config/mongoDb");
 const express = require("express");
-const app = express();
 
+const { createServer } = require("http");
+const { Server } = require("socket.io");
+
+const app = express();
+const cors = require("cors");
 const path = require("path");
 const cookieParser = require("cookie-parser");
 const logger = require("morgan");
-const http = require("http")
-const server = http.createServer(app);
-// const { Server } = require("socket.io");
-// const io = new Server(server);
-const io = require("socket.io")(server, {
-    cors: {
-      origin: "http://localhost:3000",
-      methods: ["GET", "POST"],
-      credentials: true
-    }
-  });
 
+const httpServer = createServer();
+
+const io = new Server(httpServer, {
+  cors: {
+    origin: "http://localhost:3000",
+    methods: ["GET", "POST"],
+    credentials: true,
+  },
+});
+
+// const io = require("socket.io")(server, {
+//   cors: {
+//     origin: "http://localhost:3000",
+//     methods: ["GET", "POST"],
+//     credentials: true,
+//   },
+// });
+
+io.on("connection", (socket) => {
+  console.log("a user connected", socket.id);
+});
+
+app.use(
+  cors({
+    origin: "http://localhost:3000",
+  })
+);
 
 const authRouter = require("./routes/auth");
 const { isAuthenticated } = require("./middlewares/jwt.middleware");
@@ -29,9 +49,5 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
 
 app.use("/", authRouter);
-
-io.on('connection', (socket) => {
-    console.log('a user connected', socket.id);
-});
 
 module.exports = app;
