@@ -43,6 +43,13 @@ io.on("connection", (socket) => {
   console.log(" Users Serveur side", users);
   socket.emit("users", users);
 
+  socket.broadcast.emit("user connected", {
+    userID: socket.id,
+    userEmail: socket.userEmail,
+  });
+
+  // socket.join("test room");
+
   socket.on("disconnet", () => {
     console.log("User disconnected", socket.id);
   });

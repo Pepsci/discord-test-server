@@ -16,6 +16,7 @@ app.use(
 );
 
 const authRouter = require("./routes/auth");
+const chanRouter = require("./routes/chan");
 const { isAuthenticated } = require("./middlewares/jwt.middleware");
 
 app.use(logger("dev"));
@@ -25,5 +26,6 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
 
 app.use("/", authRouter);
+app.use("/chan", chanRouter);
 
 module.exports = app;
