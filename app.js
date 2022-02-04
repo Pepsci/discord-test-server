@@ -1,37 +1,13 @@
-require("dotenv").config();
-require("./config/mongoDb");
 const express = require("express");
 
-const { createServer } = require("http");
-const { Server } = require("socket.io");
+require("dotenv").config();
+require("./config/mongoDb");
 
 const app = express();
 const cors = require("cors");
 const path = require("path");
 const cookieParser = require("cookie-parser");
 const logger = require("morgan");
-
-const httpServer = createServer();
-
-const io = new Server(httpServer, {
-  cors: {
-    origin: "http://localhost:3000",
-    methods: ["GET", "POST"],
-    credentials: true,
-  },
-});
-
-// const io = require("socket.io")(server, {
-//   cors: {
-//     origin: "http://localhost:3000",
-//     methods: ["GET", "POST"],
-//     credentials: true,
-//   },
-// });
-
-io.on("connection", (socket) => {
-  console.log("a user connected", socket.id);
-});
 
 app.use(
   cors({
