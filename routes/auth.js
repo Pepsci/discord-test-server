@@ -6,11 +6,6 @@ const userModel = require("./../models/user.model");
 
 const saltRounds = 10;
 
-/* GET users listing. */
-// routes/auth.routes.js
-
-// ... all imports stay unchanged
-
 // POST /auth/signup  - Creates a new user in the database
 router.post("/signup", (req, res, next) => {
   const { email, password, username } = req.body;

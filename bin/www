@@ -33,9 +33,28 @@ const io = require("socket.io")(server, {
 io.on("connection", (socket) => {
   console.log("a user connected", socket.id);
 
+  const users = [];
+  for (let [id, socket] of io.of("/").sockets) {
+    users.push({
+      userID: id,
+      userEmail: socket.userEmail,
+    });
+  }
+  console.log(" Users Serveur side", users);
+  socket.emit("users", users);
+
   socket.on("disconnet", () => {
     console.log("User disconnected", socket.id);
   });
+});
+
+io.use((socket, next) => {
+  const userEmail = socket.handshake.auth.email;
+  if (!userEmail) {
+    return next(new Error("invalid Email !!"));
+  }
+  socket.userEmail = userEmail;
+  next();
 });
 
 io.on("connect_error", (err) => {
