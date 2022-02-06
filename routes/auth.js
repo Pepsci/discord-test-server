@@ -1,15 +1,21 @@
 const express = require("express");
 const router = express.Router();
+
+// encryption + token creation
 const bcrypt = require("bcryptjs");
+const saltRounds = 10;
 const jwt = require("jsonwebtoken");
+
+// require model
 const userModel = require("./../models/user.model");
 
-const saltRounds = 10;
+// jwt middleware
+const { isAuthenticated } = require("./../middlewares/jwt.middleware");
 
 // POST /auth/signup  - Creates a new user in the database
 router.post("/signup", (req, res, next) => {
   const { email, password, username } = req.body;
-  console.log("req.body", req.body);
+
   // Check if email or password or username are provided as empty string
   if (email === "" || password === "" || username === "") {
     res.status(400).json({ message: "Provide email, password and username" });
@@ -39,16 +45,12 @@ router.post("/signup", (req, res, next) => {
         res.status(400).json({ message: "User already exists." });
         return;
       }
-      console.log(foundUser);
       // If email is unique, proceed to hash the password
       const salt = bcrypt.genSaltSync(saltRounds);
       const hashedPassword = bcrypt.hashSync(password, salt);
 
       // Create the new user in the database
       // We return a pending promise, which allows us to chain another `then`
-
-      // const hashedPwd = bcrypt.hashSync(newPlayer.password, 10);
-      // newPlayer.password = hashedPwd;
 
       return userModel.create({ email, password: hashedPassword, username });
     })
@@ -68,9 +70,6 @@ router.post("/signup", (req, res, next) => {
       res.status(500).json({ message: "Internal Server Error" });
     });
 });
-
-// routes/auth.routes.js
-// ...
 
 // POST  /auth/login - Verifies email and password and returns a JWT
 router.post("/login", (req, res, next) => {
@@ -115,6 +114,16 @@ router.post("/login", (req, res, next) => {
       }
     })
     .catch((err) => res.status(500).json({ message: "Internal Server Error" }));
+});
+
+router.get("/auth/verify", isAuthenticated, (req, res, next) => {
+  // If JWT token is valid the payload gets decoded by the
+  // isAuthenticated middleware and made available on `req.payload`
+  console.log(`req.payload`, req.payload);
+
+  // Send back the object with user data
+  // previously set as the token payload
+  res.status(200).json(req.payload);
 });
 
 module.exports = router;
