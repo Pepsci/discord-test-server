@@ -7,7 +7,6 @@ const chanModel = require("./../models/chan.model");
 router.get("/", async (req, res, next) => {
   try {
     const chansList = await chanModel.find().populate("owner");
-    console.log(chansList);
     res.status(200).json(chansList);
   } catch (error) {
     res.status(500).json({ message: "Internal Server Error" });
@@ -17,7 +16,6 @@ router.get("/", async (req, res, next) => {
 
 router.post("/", async (req, res, next) => {
   try {
-    console.log("req.body :>> ", req.body);
     const newChan = await chanModel.create(req.body);
     res.status(201).json(newChan);
   } catch (error) {
