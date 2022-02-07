@@ -1,3 +1,5 @@
+const joinRoom = require("./sockethandlers/roomHandler")
+
 const registerSocketServer = (server) => {
   const io = require("socket.io")(server, {
     cors: {
@@ -43,7 +45,9 @@ const registerSocketServer = (server) => {
       userEmail: socket.userEmail,
     });
 
-    socket.on("disconnet", () => {
+    joinRoom();
+
+    socket.on("disconnect", () => {
       console.log("User disconnected", socket.id);
     });
   });
