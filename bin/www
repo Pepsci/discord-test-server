@@ -8,6 +8,10 @@ var app = require("../app");
 var debug = require("debug")("server:server");
 var http = require("http");
 
+const socketServer = require("./../socketServer");
+
+// import socket Server
+
 /**
  * Get port from environment and store in Express.
  */
@@ -19,58 +23,53 @@ app.set("port", port);
  * Create HTTP server.
  */
 
-// const { Server } = ;
 const server = http.createServer(app);
+socketServer.registerSocketServer(server);
 
-const io = require("socket.io")(server, {
-  cors: {
-    origin: "http://localhost:3000",
-    methods: ["GET", "POST"],
-    credentials: true,
-  },
-});
+// const io = require("socket.io")(server, {
+//   cors: {
+//     origin: "http://localhost:3000",
+//     methods: ["GET", "POST"],
+//     credentials: true,
+//   },
+// });
 
-io.on("connection", (socket) => {
-  console.log("a user connected", socket.id);
+// io.on("connection", (socket) => {
+//   console.log("a user connected", socket.id);
 
-  const users = [];
-  for (let [id, socket] of io.of("/").sockets) {
-    users.push({
-      userID: id,
-      userEmail: socket.userEmail,
-    });
-  }
-  console.log(" Users Serveur side", users);
-  socket.emit("users", users);
+//   const users = [];
+//   for (let [id, socket] of io.of("/").sockets) {
+//     users.push({
+//       userID: id,
+//       userEmail: socket.userEmail,
+//     });
+//   }
+//   console.log(" Users Serveur side", users);
+//   socket.emit("users", users);
 
-  socket.broadcast.emit("user connected", {
-    userID: socket.id,
-    userEmail: socket.userEmail,
-  });
+//   socket.broadcast.emit("user connected", {
+//     userID: socket.id,
+//     userEmail: socket.userEmail,
+//   });
 
-  // socket.join("test room");
+//   // socket.join("test room");
 
-  socket.on("disconnet", () => {
-    console.log("User disconnected", socket.id);
-  });
-});
+//   socket.on("disconnet", () => {
+//     console.log("User disconnected", socket.id);
+//   });
+// });
 
-io.use((socket, next) => {
-  const userEmail = socket.handshake.auth.email;
-  if (!userEmail) {
-    return next(new Error("invalid Email !!"));
-  }
-  socket.userEmail = userEmail;
-  next();
-});
+// io.use((socket, next) => {
+//   const userEmail = socket.handshake.auth.email;
+//   if (!userEmail) {
+//     return next(new Error("invalid Email !!"));
+//   }
+//   socket.userEmail = userEmail;
+//   next();
+// });
 
-io.on("connect_error", (err) => {
-  console.log(`connect_error due to ${err.message}`);
-});
-
-// const io = require("socket.io")("http://localhost:3000");
-// io.on("connect", (socket) => {
-//   console.log(socket.id);
+// io.on("connect_error", (err) => {
+//   console.log(`connect_error due to ${err.message}`);
 // });
 
 /**
