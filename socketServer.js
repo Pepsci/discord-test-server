@@ -24,10 +24,10 @@ const registerSocketServer = (server) => {
     // console.log(clientSocket);
     clientSocket.emit("connected");
 
-    // clientSocket.broadcast.emit("user connected", {
-    //   userID: clientSocket.handshake.auth.id,
-    //   userEmail: clientSocket.handshake.auth.email,
-    // });
+    clientSocket.broadcast.emit("user connected", {
+      userID: clientSocket.handshake.auth.id,
+      userEmail: clientSocket.handshake.auth.email,
+    });
 
     User.findByIdAndUpdate(
       clientSocket.handshake.auth.id,
