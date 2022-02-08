@@ -1,3 +1,4 @@
+const userModel = require("./models/user.model");
 const User = require("./models/user.model");
 // const connectedUsers = require("./socketFunction/connectedUsers");
 
@@ -26,9 +27,10 @@ const registerSocketServer = (server) => {
     next();
   });
 
+  let sockets = [];
+
   io.on("connection", async (clientSocket) => {
-    console.log("-----a user connected-----");
-    // console.log(clientSocket);
+    sockets.push(clientSocket);
     clientSocket.emit("connected");
 
     clientSocket.broadcast.emit("user connected", {
@@ -53,12 +55,9 @@ const registerSocketServer = (server) => {
     const users = await User.find({ isConnected: true });
     // .then((dbResponse) => {
     //   users = dbResponse;
-    //   console.log(" Users Serveur side", users);
+    console.log(" Users Serveur side", users);
     // })
     // .catch((err) => console.error(err));
-
-    console.log("connected users", users);
-    // console.log("===============", users);
 
     // const users = [];
 
@@ -75,9 +74,16 @@ const registerSocketServer = (server) => {
     //   });
     // });
 
-    io.on("disconnect", (reason) => {
-      console.log(reason);
-      clientSocket.emit("disconnected");
+    clientSocket.on("disconnect", async () => {
+      try {
+        const disconnectedUser = await User.findByIdAndUpdate(
+          clientSocket.handshake.auth.id,
+          { isConnected: false },
+          { new: true }
+        );
+      } catch (error) {
+        console.log(error);
+      }
     });
 
     io.on("connect_error", (err) => {

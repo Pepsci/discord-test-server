@@ -19,6 +19,7 @@ app.use(
 
 const authRouter = require("./routes/auth");
 const chanRouter = require("./routes/chan");
+const userRouter = require("./routes/user");
 // const { isAuthenticated } = require("./middlewares/jwt.middleware");
 
 app.use(logger("dev"));
@@ -29,5 +30,6 @@ app.use(express.static(path.join(__dirname, "public")));
 
 app.use("/", authRouter);
 app.use("/chan", chanRouter);
+app.use("/user", userRouter);
 
 module.exports = app;

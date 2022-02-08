@@ -18,7 +18,10 @@ router.post("/signup", (req, res, next) => {
 
   // Check if email or password or username are provided as empty string
   if (email === "" || password === "" || username === "") {
-    res.status(400).json({ message: "Provide email, password and username" });
+    res.status(400).json({
+      message:
+        "Something is missing ! Please provide an email, a password and a username",
+    });
     return;
   }
 
@@ -42,7 +45,10 @@ router.post("/signup", (req, res, next) => {
     .then((foundUser) => {
       // If the user with the same email already exists, send an error response
       if (foundUser) {
-        res.status(400).json({ message: "User already exists." });
+        res.status(400).json({
+          message:
+            "Oops, you may already have an account with us, or you have a doppleganger. Either way, this email is already registered !",
+        });
         return;
       }
       // If email is unique, proceed to hash the password
@@ -91,7 +97,12 @@ router.post("/login", (req, res, next) => {
     .then((foundUser) => {
       if (!foundUser) {
         // If the user is not found, send an error response
-        res.status(401).json({ message: "User not found." });
+        res
+          .status(401)
+          .json({
+            message:
+              "Check you email mate, this one is not registered with us !",
+          });
         return;
       }
 
@@ -114,26 +125,12 @@ router.post("/login", (req, res, next) => {
         // Send the token as the response
         res.status(200).json({ authToken: authToken });
       } else {
-        res.status(401).json({ message: "Unable to authenticate the user" });
+        res
+          .status(401)
+          .json({ message: "Something, somewhere, went terribly wrong" });
       }
     })
     .catch((err) => res.status(500).json({ message: "Internal Server Error" }));
-});
-
-router.get("/user", isAuthenticated, async (req, res, next) => {
-  console.log("token", req.payload);
-  try {
-    const user = await userModel.findById(req.payload._id);
-    const userTofront = {
-      _id: user._id,
-      username: user.username,
-      amail: user.email,
-      avatar: user.avatar,
-    };
-    res.status(200).json(userTofront);
-  } catch (error) {
-    next(error);
-  }
 });
 
 router.get("/auth/verify", isAuthenticated, (req, res, next) => {
