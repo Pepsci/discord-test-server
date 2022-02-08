@@ -1,6 +1,8 @@
 require("dotenv").config();
 require("./config/mongoDb");
 
+//Je suis la o//
+
 const express = require("express");
 const app = express();
 const cors = require("cors");
