@@ -1,8 +1,7 @@
-const express = require("express");
-
 require("dotenv").config();
 require("./config/mongoDb");
 
+const express = require("express");
 const app = express();
 const cors = require("cors");
 const path = require("path");
@@ -11,13 +10,14 @@ const logger = require("morgan");
 
 app.use(
   cors({
-    origin: "http://localhost:3000",
+    credentials: true,
+    origin: process.env.CLIENT_URL,
   })
 );
 
 const authRouter = require("./routes/auth");
 const chanRouter = require("./routes/chan");
-const { isAuthenticated } = require("./middlewares/jwt.middleware");
+// const { isAuthenticated } = require("./middlewares/jwt.middleware");
 
 app.use(logger("dev"));
 app.use(express.json());
