@@ -24,4 +24,15 @@ router.post("/", async (req, res, next) => {
   }
 });
 
+router.get("/:id", async (req, res, next) => {
+  try {
+const chan = await chanModel.findById(req.params.id);
+res.status(201).json(chan)
+  }
+  catch(e){
+    res.status(500).json({message: "Internal Server Error"})
+    next(e)
+  }
+})
+
 module.exports = router;

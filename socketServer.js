@@ -1,5 +1,6 @@
 const User = require("./models/user.model");
 // const connectedUsers = require("./socketFunction/connectedUsers");
+const joinRoom = require("./sockethandlers/roomHandler")
 
 const registerSocketServer = (server) => {
   const io = require("socket.io")(server, {
@@ -36,6 +37,7 @@ const registerSocketServer = (server) => {
       userEmail: clientSocket.handshake.auth.email,
     });
 
+
     User.findByIdAndUpdate(
       clientSocket.handshake.auth.id,
       {
@@ -69,6 +71,8 @@ const registerSocketServer = (server) => {
     //   });
     // }
 
+    joinRoom();
+    
     clientSocket.emit("users", users);
     //   socket.on("disconnected", () => {
     //     console.log("User disconnected", socket.id);
@@ -78,6 +82,8 @@ const registerSocketServer = (server) => {
     io.on("disconnect", (reason) => {
       console.log(reason);
       clientSocket.emit("disconnected");
+
+
     });
 
     io.on("connect_error", (err) => {
