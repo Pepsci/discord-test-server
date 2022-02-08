@@ -4,11 +4,18 @@ const User = require("./models/user.model");
 const registerSocketServer = (server) => {
   const io = require("socket.io")(server, {
     cors: {
-      origin: "http://localhost:3000",
+      origin: process.env.CLIENT_URL,
       methods: ["GET", "POST"],
       credentials: true,
     },
   });
+  // const io = require("socket.io")(server, {
+  //   cors: {
+  //     origin: process.env.CLIENT_URL,
+  //     methods: ["GET", "POST"],
+  //     credentials: true,
+  //   },
+  // });
 
   io.use((clientSocket, next) => {
     const token = clientSocket.handshake.auth.token;
