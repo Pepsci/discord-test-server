@@ -1,6 +1,11 @@
-const userModel = require("./models/user.model");
 const User = require("./models/user.model");
-// const connectedUsers = require("./socketFunction/connectedUsers");
+const {
+  createChan,
+  joinChan,
+  chanLeave,
+  chanDelete,
+} = require("./sockethandlers/chanHandler");
+const { sendMessage, saveMessage } = require("./sockethandlers/messageHandler");
 
 const registerSocketServer = (server) => {
   const io = require("socket.io")(server, {
@@ -10,13 +15,6 @@ const registerSocketServer = (server) => {
       credentials: true,
     },
   });
-  // const io = require("socket.io")(server, {
-  //   cors: {
-  //     origin: process.env.CLIENT_URL,
-  //     methods: ["GET", "POST"],
-  //     credentials: true,
-  //   },
-  // });
 
   io.use((clientSocket, next) => {
     const token = clientSocket.handshake.auth.token;
@@ -60,6 +58,11 @@ const registerSocketServer = (server) => {
     clientSocket.on("user update", async () => {
       clientSocket.emit("users", users);
     });
+
+    createChan(clientSocket);
+    joinChan(clientSocket);
+    sendMessage(clientSocket);
+    chanLeave(clientSocket);
 
     // on disconnect, set user status back to isConnected: false
     // emit the users list again

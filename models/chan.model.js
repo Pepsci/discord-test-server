@@ -6,6 +6,7 @@ const chanSchema = new Schema({
     required: true,
     unique: true,
   },
+  participants: [{ type: Schema.Types.ObjectId, ref: "user" }],
   owner: { type: Schema.Types.ObjectId, ref: "user" },
   image: {
     type: String,
