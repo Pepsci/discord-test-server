@@ -1,11 +1,6 @@
 const User = require("./models/user.model");
-const {
-  createChan,
-  joinChan,
-  chanLeave,
-  chanDelete,
-} = require("./sockethandlers/chanHandler");
-const { sendMessage, saveMessage } = require("./sockethandlers/messageHandler");
+const Message = require("./models/message.model");
+const chanModel = require("./models/chan.model");
 
 const registerSocketServer = (server) => {
   const io = require("socket.io")(server, {
@@ -59,10 +54,24 @@ const registerSocketServer = (server) => {
       clientSocket.emit("users", users);
     });
 
-    createChan(clientSocket);
-    joinChan(clientSocket);
-    sendMessage(clientSocket);
-    chanLeave(clientSocket);
+    // triggered when user clicks to join chan
+    clientSocket.on("chan-join", async (data) => {
+      try {
+        const chan = await chanModel.findById(data).populate("participants");
+        clientSocket.to(chan).emit("user joined", "someone just joined the room, say hello");
+        //TO DO : get users in the room
+        // chan.participants.push()
+      } catch (e) {
+        console.error("join chan :", e);
+        clientSocket.emit("error", "couldnt perform requested action");
+      }
+    });
+
+    clientSocket.on("send-message", (data) => {
+      console.log(data)
+      Message.create(data);
+      clientSocket.to(data).emit("receive-message", data);
+    });
 
     // on disconnect, set user status back to isConnected: false
     // emit the users list again
