@@ -5,7 +5,7 @@ const chanModel = require("./models/chan.model");
 const registerSocketServer = (server) => {
   const io = require("socket.io")(server, {
     cors: {
-      origin: process.env.CLIENT_URL,
+      origin: process.env.FRONTEND_URL,
       methods: ["GET", "POST"],
       credentials: true,
     },
@@ -58,7 +58,9 @@ const registerSocketServer = (server) => {
     clientSocket.on("chan-join", async (data) => {
       try {
         const chan = await chanModel.findById(data).populate("participants");
-        clientSocket.to(chan).emit("user joined", "someone just joined the room, say hello");
+        clientSocket
+          .to(chan)
+          .emit("user joined", "someone just joined the room, say hello");
         //TO DO : get users in the room
         // chan.participants.push()
       } catch (e) {
@@ -68,7 +70,7 @@ const registerSocketServer = (server) => {
     });
 
     clientSocket.on("send-message", (data) => {
-      console.log(data)
+      console.log(data);
       Message.create(data);
       clientSocket.to(data).emit("receive-message", data);
     });
