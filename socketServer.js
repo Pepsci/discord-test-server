@@ -38,6 +38,7 @@ const registerSocketServer = (server) => {
       userEmail: clientSocket.handshake.auth.email,
     });
 
+    // on connection, update user status to isConnected: true
     User.findByIdAndUpdate(
       clientSocket.handshake.auth.id,
       {
@@ -50,30 +51,18 @@ const registerSocketServer = (server) => {
       })
       .catch((err) => console.error(err));
 
-    //updated is connected in User Table
-    // let users = [];
+    // get all users that are isConnected: true
+    // and send them to front
     const users = await User.find({ isConnected: true });
-    // .then((dbResponse) => {
-    //   users = dbResponse;
-    console.log(" Users Serveur side", users);
-    // })
-    // .catch((err) => console.error(err));
-
-    // const users = [];
-
-    // for (let [id, socket] of io.of("/").sockets) {
-    //   users.push({
-    //     userID: id,
-    //     userEmail: socket.userEmail,
-    //   });
-    // }
-
     clientSocket.emit("users", users);
-    //   socket.on("disconnected", () => {
-    //     console.log("User disconnected", socket.id);
-    //   });
-    // });
 
+    // send the list of users back to front when a client update its profile
+    clientSocket.on("user update", async () => {
+      clientSocket.emit("users", users);
+    });
+
+    // on disconnect, set user status back to isConnected: false
+    // emit the users list again
     clientSocket.on("disconnect", async () => {
       try {
         const disconnectedUser = await User.findByIdAndUpdate(
@@ -81,6 +70,7 @@ const registerSocketServer = (server) => {
           { isConnected: false },
           { new: true }
         );
+        clientSocket.emit("users", users);
       } catch (error) {
         console.log(error);
       }

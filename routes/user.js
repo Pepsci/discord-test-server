@@ -37,23 +37,41 @@ router.delete("/:id", isAuthenticated, async (req, res, next) => {
 });
 
 // update user info
-router.patch("/:id", uploader.single("avatar"), async (req, res, next) => {
-  const avatar = req.file?.path || undefined;
-  console.log("===> avatar ??", avatar);
-  try {
-    const updatedUser = await userModel.findByIdAndUpdate(
-      req.params.id,
-      {
-        ...req.body,
-        avatar: avatar,
-      },
-      { new: true }
-    );
-    console.log("====> ", updatedUser);
-    res.status(200).json(updatedUser);
-  } catch (error) {
-    next(error);
+router.patch(
+  "/:id",
+  isAuthenticated,
+  uploader.single("avatar"),
+  async (req, res, next) => {
+    const avatar = req.file?.path || undefined;
+
+    try {
+      const updatedUser = await userModel.findByIdAndUpdate(
+        req.params.id,
+        {
+          ...req.body,
+          avatar: avatar,
+        },
+        { new: true }
+      );
+
+      const payload = {
+        _id: updatedUser._id,
+        username: updatedUser.username,
+        email: updatedUser.email,
+        avatar: updatedUser.avatar,
+      };
+
+      // à la place de payload, mettre le user sans le mdp
+      const authToken = jwt.sign(payload, process.env.TOKEN_SECRET, {
+        algorithm: "HS256",
+        expiresIn: "6h",
+      });
+      // renvoyer en front
+      res.status(200).json({ payload, authToken });
+    } catch (error) {
+      next(error);
+    }
   }
-});
+);
 
 module.exports = router;
