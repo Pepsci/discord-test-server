@@ -39,11 +39,12 @@ router.delete("/:id", isAuthenticated, async (req, res, next) => {
 // update user info
 router.patch(
   "/:id",
-  isAuthenticated,
   uploader.single("avatar"),
+  isAuthenticated,
   async (req, res, next) => {
     const avatar = req.file?.path || undefined;
-
+    console.log(req.file);
+    console.log("what is avatar ?? ===> ", avatar);
     try {
       const updatedUser = await userModel.findByIdAndUpdate(
         req.params.id,
