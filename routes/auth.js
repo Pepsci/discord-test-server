@@ -57,11 +57,13 @@ router.post("/signup", (req, res, next) => {
 
       // Create the new user in the database
       // We return a pending promise, which allows us to chain another `then`
+      const avatar = `https://avatars.dicebear.com/api/bottts/${username}.svg`;
 
       return userModel.create({
         email,
         password: hashedPassword,
         username,
+        avatar,
       });
     })
     .then((createdUser) => {
@@ -97,12 +99,9 @@ router.post("/login", (req, res, next) => {
     .then((foundUser) => {
       if (!foundUser) {
         // If the user is not found, send an error response
-        res
-          .status(401)
-          .json({
-            message:
-              "Check you email mate, this one is not registered with us !",
-          });
+        res.status(401).json({
+          message: "Check you email mate, this one is not registered with us !",
+        });
         return;
       }
 
