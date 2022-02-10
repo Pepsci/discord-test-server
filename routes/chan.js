@@ -74,5 +74,18 @@ router.get("/:id/messages", async (req, res, next) => {
     next(e);
   }
 });
+ 
+router.patch("/messages/:id", async (req, res, next) => {
+  const content = Object.keys(req.body)[0]
+  try {
+    const updatedMessage = await Message.findByIdAndUpdate(req.params.id,{content: content})
+    console.log(updatedMessage)
+    res.status(200).json({message: "message edited"})
+  }
+  catch(e){
+    console.error(e)
+  }
+})
+
 
 module.exports = router;
