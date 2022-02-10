@@ -9,7 +9,6 @@ const uploader = require("./../config/cloudinary");
 router.get("/", async (req, res, next) => {
   try {
     const chansList = await chanModel.find().populate("owner");
-    console.log(chansList);
     res.status(200).json(chansList);
   } catch (error) {
     res.status(500).json({ message: "Internal Server Error" });
