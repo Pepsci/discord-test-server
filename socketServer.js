@@ -69,10 +69,17 @@ const registerSocketServer = (server) => {
       }
     });
 
-    clientSocket.on("send-message", (data) => {
-      console.log(data);
-      Message.create(data);
-      clientSocket.to(data).emit("receive-message", data);
+    clientSocket.on("send-message", async (data) => {
+      try {
+        console.log(data);
+       const newMessage = await Message.create(data);
+       const currentChan = await chanModel.findById(data.chan);
+       console.log(" CURRENT CHAN :", currentChan, "CURRENT CHAN NAME", currentChan.name)
+        io.emit("receive-message", newMessage);
+      } catch(err) {
+        console.error(err)
+      }
+
     });
 
     // on disconnect, set user status back to isConnected: false
