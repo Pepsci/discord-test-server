@@ -10,6 +10,8 @@ const path = require("path");
 const cookieParser = require("cookie-parser");
 const logger = require("morgan");
 
+console.log(process.env.FRONTEND_URL);
+
 app.use(
   cors({
     credentials: true,
