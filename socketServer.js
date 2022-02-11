@@ -32,6 +32,7 @@ const registerSocketServer = (server) => {
     });
 
     // trying video chat
+
     clientSocket.emit("me", clientSocket.id);
 
     clientSocket.on("calluser", ({ userToCall, signalData, from, name }) => {
