@@ -31,6 +31,17 @@ const registerSocketServer = (server) => {
       userEmail: clientSocket.handshake.auth.email,
     });
 
+    // trying video chat
+    clientSocket.emit("me", clientSocket.id);
+
+    clientSocket.on("calluser", ({ userToCall, signalData, from, name }) => {
+      io.to(userToCall).emit("calluser", { signal: signalData, from, name });
+    });
+
+    clientSocket.on("answercall", (data) => {
+      io.to(data.to).emit("callaccepted", data.signal);
+    });
+
     // on connection, update user status to isConnected: true
     User.findByIdAndUpdate(
       clientSocket.handshake.auth.id,
@@ -72,14 +83,18 @@ const registerSocketServer = (server) => {
     clientSocket.on("send-message", async (data) => {
       try {
         console.log(data);
-       const newMessage = await Message.create(data);
-       const currentChan = await chanModel.findById(data.chan);
-       console.log(" CURRENT CHAN :", currentChan, "CURRENT CHAN NAME", currentChan.name)
+        const newMessage = await Message.create(data);
+        const currentChan = await chanModel.findById(data.chan);
+        console.log(
+          " CURRENT CHAN :",
+          currentChan,
+          "CURRENT CHAN NAME",
+          currentChan.name
+        );
         io.emit("receive-message", newMessage);
-      } catch(err) {
-        console.error(err)
+      } catch (err) {
+        console.error(err);
       }
-
     });
 
     // on disconnect, set user status back to isConnected: false
